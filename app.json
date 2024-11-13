@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "photoalbum",
-    "slug": "photoalbum",
+    "slug": "photo-album-",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -36,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ff38efeb-2e55-4119-8d6f-9e234d5b7efc"
+      }
+    },
+    "owner": "okewunmi91"
   }
 }
