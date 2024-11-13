@@ -20,20 +20,18 @@ import welcome from "../constants/images";
 // import { useGlobalContext } from "../ContextFile/GlobalProvider";
 
 const Index = () => {
-  // const { isLoggedIn, loading } = useGlobalContext();
-  // if (!loading && !isLoggedIn) return <Redirect href="/home" />;
-
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.Box}>
         <Image source={welcome} resizeMode="contain" style={styles.img} />
         <View style={styles.txtBox}>
-          <Text style={styles.txt}>Let’s Connect Together</Text>
+          <Text style={styles.txt}>Let’s Connect Together </Text>
         </View>
         <View style={styles.btnBox}>
-          <Link style={[styles.btn, styles.btnWhite]} href="/sign-in">
+          <Link style={[styles.btn, styles.btnWhite]} href="/home">
             Login
           </Link>
+
           <Link href="/sign-up" style={[styles.btn, styles.btncolor]}>
             Sign Up
           </Link>
@@ -52,57 +50,59 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   Box: {
+    marginTop: 100,
     minHeight: "85%",
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
     padding: 30,
+    gap: 10,
   },
   img: {
-    marginTop: 90,
     height: 280,
-    maxWidth: 350,
-    width: "100%",
+    width: 350,
   },
   txtBox: {
     marginTop: 15,
     paddingVertical: 40,
+    paddingHorizontal: 30,
+    // gap: ,
   },
   txt: {
-    color: "#000",
-    fontSize: 30,
-    fontWeight: "light",
+    color: "black",
+    fontSize: 28,
+    fontWeight: "700",
     textAlign: "center",
+    // lineHeight: 38,
+    fontFamily: "Inter",
   },
   btnBox: {
-    gap: 15,
+    gap: 14,
   },
   btn: {
-    borderRadius: 50,
+    borderRadius: 100,
     width: 280,
     height: 30,
-    padding: 25,
+    padding: 11,
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#9E9898",
   },
+
   btnWhite: {
     backgroundColor: "#fff",
+    color: "#000",
+    textAlign: "center",
+    height: "auto",
+    fontSize: 15,
+    fontWeight: "bold",
   },
   btncolor: {
     backgroundColor: "#FA9884",
     color: "#fff",
+    textAlign: "center",
+    height: "auto",
+    fontWeight: "bold",
     fontSize: 15,
-    fontWeight: "400",
-  },
-  btntxtblack: {
-    color: "#000",
-    fontSize: 15,
-    fontWeight: "400",
-  },
-  btntxtwhite: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "400",
   },
 });

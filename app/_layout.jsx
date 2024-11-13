@@ -1,18 +1,21 @@
-import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect } from "react";
 import { SplashScreen, Stack } from "expo-router";
-// import { useFonts } from "expo-font";
+import { useFonts } from "expo-font";
 // import GlobalProvider from "../ContextFile/GlobalProvider";
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
-  // useEffect(() => {
-  //   if (error) throw error;
-  //   if (fontsLoaded) SplashScreen.hideAsync();
-  // }, [fontsLoaded, error]);
+  const [fontsLoaded, error] = useFonts({
+    regular: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
 
-  // if (!fontsLoaded && !error) return null;
+  useEffect(() => {
+    if (error) throw error;
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded, error]);
+
+  if (!fontsLoaded && !error) return null;
 
   return (
     // <GlobalProvider>

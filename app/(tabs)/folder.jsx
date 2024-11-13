@@ -1,7 +1,11 @@
 import React from "react";
-
+import { Text, View } from "react-native";
 const folder = () => {
-  return <div>folder</div>;
+  return (
+    <View>
+      <Text>folder</Text>
+    </View>
+  );
 };
 
 export default folder;

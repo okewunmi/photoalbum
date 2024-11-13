@@ -7,25 +7,44 @@ const TabLayout = () => {
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
-          tabBarActiveTintColor: "#FFA001",
-          tabBarInactiveTintColor: "#CDCDE0",
+          tabBarActiveTintColor: "#FA9884",
+          tabBarInactiveTintColor: "#9E9898",
           tabBarStyle: {
-            backgroundColor: "#161622",
-            borderTopWidth: 1,
-            borderTopColor: "#232533",
-            height: 80,
+            backgroundColor: "#423D3D",
+            paddingTop: 4,
+            height: 50,
+            borderRadius: 20,
+            marginBottom: 15,
+            width: "92%",
+            alignSelf: "center",
+            justifyContent: "center",
           },
         }}
       >
         <Tabs.Screen
           name="home"
           options={{
+            headerShown: false,
             title: "Home",
             tabBarIcon: ({ focused }) => (
               <Feather
                 name={"home"}
-                size={focused ? 35 : 25}
-                color={focused ? "#f89a2e" : "#CDCDE0"}
+                size={focused ? 25 : 20}
+                color={focused ? "#FA9884" : "#9E9898"}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="search"
+          options={{
+            headerShown: false,
+            title: "Home",
+            tabBarIcon: ({ focused }) => (
+              <Feather
+                name={"search"}
+                size={focused ? 25 : 20}
+                color={focused ? "#FA9884" : "#9E9898"}
               />
             ),
           }}
@@ -35,11 +54,12 @@ const TabLayout = () => {
           name="folder"
           options={{
             title: "Folder",
+            headerShown: false,
             tabBarIcon: ({ focused }) => (
               <Feather
                 name={"folder"}
-                size={focused ? 35 : 25}
-                color={focused ? "#f89a2e" : "#CDCDE0"}
+                size={focused ? 25 : 20}
+                color={focused ? "#FA9884" : "#9E9898"}
               />
             ),
           }}
@@ -48,12 +68,13 @@ const TabLayout = () => {
         <Tabs.Screen
           name="profile"
           options={{
+            headerShown: false,
             title: "Profile",
             tabBarIcon: ({ focused }) => (
               <Feather
                 name={"person"}
-                size={focused ? 35 : 25}
-                color={focused ? "#f89a2e" : "#CDCDE0"}
+                size={focused ? 25 : 20}
+                color={focused ? "#FA9884" : "#9E9898"}
               />
             ),
           }}
