@@ -15,7 +15,7 @@ import { router, Redirect, Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import welcome from "../constants/images";
+import welcome from "../assets/images/welcome.png";
 
 // import { useGlobalContext } from "../ContextFile/GlobalProvider";
 

@@ -1,3 +1,4 @@
 import welcome from "../assets/images/welcome.png";
+import dash from "../assets/images/dash.png";
 
-export default welcome;
+export default { welcome, dash };
