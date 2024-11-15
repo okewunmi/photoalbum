@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Button,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 
 import { router, Redirect, Link } from "expo-router";
@@ -28,13 +29,19 @@ const Index = () => {
           <Text style={styles.txt}>Let’s Connect Together </Text>
         </View>
         <View style={styles.btnBox}>
-          <Link style={[styles.btn, styles.btnWhite]} href="/home">
-            Login
-          </Link>
+          <TouchableOpacity
+            style={styles.btnWhite}
+            onPress={() => router.push("/home")}
+          >
+            <Text style={styles.btn2}> Login</Text>
+          </TouchableOpacity>
 
-          <Link href="/sign-up" style={[styles.btn, styles.btncolor]}>
-            Sign Up
-          </Link>
+          <TouchableOpacity
+            style={styles.btncolor}
+            onPress={() => router.push("/sign-up")}
+          >
+            <Text style={styles.btn1}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <StatusBar backgroundColor="#ffff" style="light" />
@@ -79,30 +86,38 @@ const styles = StyleSheet.create({
   btnBox: {
     gap: 14,
   },
-  btn: {
-    borderRadius: 100,
-    width: 280,
-    height: 30,
-    padding: 11,
+  btn1: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  btn2: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  btnWhite: {
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#9E9898",
-  },
-
-  btnWhite: {
-    backgroundColor: "#fff",
-    color: "#000",
-    textAlign: "center",
-    height: "auto",
-    fontSize: 15,
-    fontWeight: "bold",
+    borderRadius: 100,
+    width: 290,
+    height: 42,
   },
   btncolor: {
     backgroundColor: "#FA9884",
     color: "#fff",
-    textAlign: "center",
-    height: "auto",
+    alignItems: "center",
+    justifyContent: "center",
     fontWeight: "bold",
-    fontSize: 15,
+    borderRadius: 100,
+    width: 290,
+    height: 42,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#9E9898",
   },
 });

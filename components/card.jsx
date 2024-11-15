@@ -1,154 +1,25 @@
-// import React from "react";
-// import {
-//   Pressable,
-//   StyleSheet,
-//   Text,
-//   Touchable,
-//   View,
-//   Modal,
-// } from "react-native";
-// import FontAwesome from "@expo/vector-icons/FontAwesome";
-
-// import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-
-// const Card = () => {
-//   return (
-//     <Pressable>
-//       <View style={styles.card}>
-//         <View style={styles.head}>
-//           <View style={styles.image}>
-//             <View style={styles.bg}></View>
-//             <View>
-//               <Text style={styles.txt1}>Fabrics Collections</Text>
-//               <Text style={styles.txt2}>Classic Materials</Text>
-//             </View>
-//           </View>
-//           <Pressable>
-//             <SimpleLineIcons name="options" size={20} color="#575353" />
-//           </Pressable>
-//         </View>
-//         <View style={styles.body}></View>
-//         <View style={styles.bottom}>
-//           <Text style={styles.txt3}>30 mins ago</Text>
-//           <View style={styles.shared}>
-//             <FontAwesome name="send" size={20} color="#575353" />
-//             <Text style={styles.txt3}>3</Text>
-//           </View>
-//         </View>
-//       </View>
-//     </Pressable>
-//   );
-// };
-
-// export default Card;
-
-// const styles = StyleSheet.create({
-//   card: {
-//     width: 310,
-//     height: 450,
-//     backgroundColor: "#FCFCFC",
-//     borderRadius: 20,
-//     paddingVertical: 25,
-//     paddingHorizontal: 20,
-//     display: "flex",
-//     justifyContent: "space-between",
-//     marginBottom: 15,
-
-//     // Shadow for iOS
-//     shadowColor: "#000", // Shadow color
-//     shadowOffset: {
-//       width: 0,
-//       height: 5,
-//     },
-
-//     // Position of shadow
-//     shadowOpacity: 0.15,
-//     // Opacity of shadow
-
-//     shadowRadius: 5,
-//     // Blur radius of shadow
-
-//     // Shadow for Android
-//     elevation: 8,
-//   },
-//   head: {
-//     display: "flex",
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//   },
-//   image: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     gap: 10,
-//   },
-//   txt1: {
-//     fontSize: 14,
-//     fontWeight: "900",
-//     fontFamily: "Inter",
-//     color: "#000",
-//   },
-//   txt2: {
-//     fontSize: 12,
-//     marginTop: -1,
-//     fontFamily: "Inter",
-//     color: "#575353",
-//     // fontWeight: "light",
-//   },
-//   txt3: {
-//     color: "#575353",
-//     fontSize: 14,
-//     fontWeight: "900",
-//     fontFamily: "Inter",
-//   },
-//   bg: {
-//     borderRadius: 100,
-//     // backgroundColor: "#575353",
-//     height: 55,
-//     width: 55,
-//     borderWidth: 4,
-//     borderColor: "#FA9884",
-//     borderStyle: "solid",
-//   },
-//   shared: {
-//     flexDirection: "row",
-//     display: "flex",
-//     gap: 10,
-//     alignItems: "center",
-//   },
-//   body: {
-//     width: "100%",
-//     height: "70%",
-//     borderRadius: 20,
-//     backgroundColor: "#4531b9",
-//   },
-//   bottom: {
-//     display: "flex",
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "space-between",
-//     paddingHorizontal: 5,
-//   },
-// });
 import React, { useState } from "react";
 import {
   Pressable,
   StyleSheet,
   Text,
+  Touchable,
   View,
   Modal,
-  TouchableOpacity,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
 import * as Linking from "expo-linking";
 import * as Clipboard from "expo-clipboard";
-
-const Card = () => {
+const Card = ({ post }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Function to handle sharing links to social media
+  //  Function to handle sharing links to social media
   const handleShareLink = async (platform) => {
     const link = "https://yourlink.com"; // replace with your actual link
 
@@ -170,26 +41,43 @@ const Card = () => {
       Alert.alert("Error", "Unable to open the link.");
     }
   };
-
   // Function to copy the link to clipboard
   const copyLinkToClipboard = async () => {
     await Clipboard.setStringAsync("https://yourlink.com");
     Alert.alert("Link copied to clipboard!");
   };
 
+  {
+    /* <FontAwesome5 name="whatsapp-square" size={24} color="black" />
+  <FontAwesome5 name="telegram" size={24} color="black" />
+  <FontAwesome5 name="twitter-square" size={24} color="black" />
+  <FontAwesome5 name="linkedin" size={24} color="black" />
+  <MaterialCommunityIcons name="gmail" size={24} color="black" />
+<Entypo name="clipboard" size={24} color="black" />
+
+  */
+  }
+
   return (
     <Pressable>
       <View style={styles.card}>
         <View style={styles.head}>
           <View style={styles.image}>
-            <View style={styles.bg}></View>
+            {/* <View style={styles.bg}></View> */}
             <View>
-              <Text style={styles.txt1}>Fabrics Collections</Text>
-              <Text style={styles.txt2}>Classic Materials</Text>
+              <Text style={styles.txt1}>
+                {post.heading || "Fabrics Collections"}
+              </Text>
+              <Text style={styles.txt2}>{post.txt || "Classic Materials"}</Text>
             </View>
           </View>
-          <Pressable onPress={() => setModalVisible(true)}>
-            <SimpleLineIcons name="options" size={20} color="#575353" />
+          <Pressable>
+            <Entypo
+              name="share"
+              size={20}
+              color="#575353"
+              onPress={() => setModalVisible(true)}
+            />
           </Pressable>
         </View>
         <View style={styles.body}></View>
@@ -211,7 +99,7 @@ const Card = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Share or Copy Link</Text>
+            <Text style={styles.modalTitle}>Share </Text>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={() => handleShareLink("whatsapp")}
@@ -251,18 +139,30 @@ export default Card;
 const styles = StyleSheet.create({
   card: {
     width: 310,
-    height: 450,
+    height: 300,
     backgroundColor: "#FCFCFC",
     borderRadius: 20,
-    paddingVertical: 25,
+    paddingVertical: 12,
     paddingHorizontal: 20,
     display: "flex",
     justifyContent: "space-between",
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
+
+    // Shadow for iOS
+    shadowColor: "#000", // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
+    // Position of shadow
     shadowOpacity: 0.15,
+    // Opacity of shadow
+
     shadowRadius: 5,
+    // Blur radius of shadow
+
+    // Shadow for Android
     elevation: 8,
   },
   head: {
@@ -277,29 +177,32 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   txt1: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "900",
     fontFamily: "Inter",
     color: "#000",
   },
   txt2: {
     fontSize: 12,
-    marginTop: -1,
+    marginTop: 0,
     fontFamily: "Inter",
     color: "#575353",
+    // fontWeight: "light",
   },
   txt3: {
     color: "#575353",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "900",
     fontFamily: "Inter",
   },
   bg: {
     borderRadius: 100,
-    height: 55,
-    width: 55,
+    // backgroundColor: "#575353",
+    height: 45,
+    width: 45,
     borderWidth: 4,
     borderColor: "#FA9884",
+    borderStyle: "solid",
   },
   shared: {
     flexDirection: "row",
@@ -314,6 +217,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4531b9",
   },
   bottom: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -326,15 +230,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContainer: {
-    width: 250,
+    bottom: 0,
+    // left: 0,
+    position: "absolute",
+    width: "99%",
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 30,
     backgroundColor: "#FFF",
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
   },
   modalButton: {
     padding: 10,

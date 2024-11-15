@@ -88,6 +88,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name="notify"
           options={{
+            // tabBarBadge: 1,
             headerShown: false,
             title: "Notify",
             tabBarIcon: ({ focused }) => (
@@ -100,7 +101,7 @@ const TabLayout = () => {
           }}
         />
       </Tabs>
-      {/* <StatusBar backgroundColor="#fff" style="light" hidden /> */}
+      <StatusBar backgroundColor="#f2f2f2" style="light" />
     </>
   );
 };
