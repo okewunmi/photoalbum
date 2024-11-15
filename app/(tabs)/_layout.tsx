@@ -58,7 +58,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name="folder"
           options={{
-            title: "Folder",
+            title: "folder",
             headerShown: false,
             tabBarIcon: ({ focused }) => (
               <MaterialIcons
