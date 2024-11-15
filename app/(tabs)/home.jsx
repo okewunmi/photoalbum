@@ -9,10 +9,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Button,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 import Card from "../../components/card";
 import Shared from "../../components/shared";
 import dash from "../../assets/images/dash.png";
@@ -104,6 +106,9 @@ const home = () => {
                 keyboardType="text"
                 style={styles.input}
               />
+              <Pressable>
+                <Feather name="search" size={22} color="#575353" />
+              </Pressable>
             </TouchableOpacity>
             <View style={styles.shared}>
               <Text style={styles.sharedtxt}>Recently Uploaded</Text>
@@ -157,15 +162,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000",
     borderRadius: 20,
-    alignContent: "center",
-    justifyContent: "center",
+    alignItems: "center",
+    justifyContent: "space-between",
+    display: "flex",
+    flexDirection: "row",
+    paddingHorizontal: 10,
   },
   input: {
-    width: "100%",
+    width: "90%",
     height: "100%",
     paddingHorizontal: 15,
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 13,
+    fontWeight: "light",
     borderStyle: "solid",
     // backgroundColor: "grey",
     borderRadius: 20,

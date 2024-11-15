@@ -19,20 +19,35 @@ import * as Clipboard from "expo-clipboard";
 const Card = ({ post }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  //  Function to handle sharing links to social media
   const handleShareLink = async (platform) => {
     const link = "https://yourlink.com"; // replace with your actual link
+    const message = encodeURIComponent("Check this out: " + link);
 
     try {
       switch (platform) {
         case "whatsapp":
-          await Linking.openURL(`whatsapp://send?text=${link}`);
+          await Linking.openURL(`whatsapp://send?text=${message}`);
           break;
         case "telegram":
-          await Linking.openURL(`tg://msg?text=${link}`);
+          await Linking.openURL(`tg://msg?text=${message}`);
           break;
         case "x":
-          await Linking.openURL(`https://x.com/intent/tweet?text=${link}`);
+          await Linking.openURL(`https://x.com/intent/tweet?text=${message}`);
+          break;
+        case "linkedin":
+          await Linking.openURL(
+            `https://www.linkedin.com/sharing/share-offsite/?url=${link}`
+          );
+          break;
+        case "gmail":
+          await Linking.openURL(
+            `mailto:?subject=Check this out&body=${message}`
+          );
+          break;
+        case "slack":
+          await Linking.openURL(
+            `slack://open?team=your_team_id&channel=your_channel_id`
+          );
           break;
         default:
           Alert.alert("Platform not supported");
@@ -41,25 +56,15 @@ const Card = ({ post }) => {
       Alert.alert("Error", "Unable to open the link.");
     }
   };
+
   // Function to copy the link to clipboard
   const copyLinkToClipboard = async () => {
     await Clipboard.setStringAsync("https://yourlink.com");
     Alert.alert("Link copied to clipboard!");
   };
 
-  {
-    /* <FontAwesome5 name="whatsapp-square" size={24} color="black" />
-  <FontAwesome5 name="telegram" size={24} color="black" />
-  <FontAwesome5 name="twitter-square" size={24} color="black" />
-  <FontAwesome5 name="linkedin" size={24} color="black" />
-  <MaterialCommunityIcons name="gmail" size={24} color="black" />
-<Entypo name="clipboard" size={24} color="black" />
-
-  */
-  }
-
   return (
-    <Pressable>
+    <>
       <View style={styles.card}>
         <View style={styles.head}>
           <View style={styles.image}>
@@ -71,14 +76,25 @@ const Card = ({ post }) => {
               <Text style={styles.txt2}>{post.txt || "Classic Materials"}</Text>
             </View>
           </View>
-          <Pressable>
-            <Entypo
-              name="share"
-              size={20}
-              color="#575353"
-              onPress={() => setModalVisible(true)}
-            />
-          </Pressable>
+
+          <View style={styles.folderButton}>
+            <Pressable>
+              <FontAwesome
+                name="folder-open"
+                size={24}
+                color="#575353"
+                onPress={() => console.log("open folder")}
+              />
+            </Pressable>
+            <Pressable>
+              <Entypo
+                name="share"
+                size={22}
+                color="#575353"
+                onPress={() => setModalVisible(true)}
+              />
+            </Pressable>
+          </View>
         </View>
         <View style={styles.body}></View>
         <View style={styles.bottom}>
@@ -100,37 +116,59 @@ const Card = ({ post }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Share </Text>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => handleShareLink("whatsapp")}
-            >
-              <Text style={styles.modalButtonText}>Share on WhatsApp</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => handleShareLink("telegram")}
-            >
-              <Text style={styles.modalButtonText}>Share on Telegram</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => handleShareLink("x")}
-            >
-              <Text style={styles.modalButtonText}>Share on X</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={copyLinkToClipboard}
-            >
-              <Text style={styles.modalButtonText}>Copy Link</Text>
-            </TouchableOpacity>
+
+            <View style={styles.modalGrid}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => handleShareLink("whatsapp")}
+              >
+                <FontAwesome5 name="whatsapp-square" size={24} color="black" />
+                <Text style={styles.modalButtonText}> WhatsApp</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => handleShareLink("linkedin")}
+              >
+                <FontAwesome5 name="linkedin" size={24} color="black" />
+                <Text style={styles.modalButtonText}> linkedin</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => handleShareLink("gmail")}
+              >
+                <MaterialCommunityIcons name="gmail" size={24} color="black" />
+                <Text style={styles.modalButtonText}> gmail</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => handleShareLink("telegram")}
+              >
+                <FontAwesome5 name="telegram" size={24} color="black" />
+                <Text style={styles.modalButtonText}>Telegram</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => handleShareLink("x")}
+              >
+                <FontAwesome5 name="twitter-square" size={24} color="black" />
+                <Text style={styles.modalButtonText}> X</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={copyLinkToClipboard}
+              >
+                <Entypo name="clipboard" size={24} color="black" />
+                <Text style={styles.modalButtonText}>Copy Link</Text>
+              </TouchableOpacity>
+            </View>
+
             <Pressable onPress={() => setModalVisible(false)}>
               <Text style={styles.closeModal}>Close</Text>
             </Pressable>
           </View>
         </View>
       </Modal>
-    </Pressable>
+    </>
   );
 };
 
@@ -204,6 +242,10 @@ const styles = StyleSheet.create({
     borderColor: "#FA9884",
     borderStyle: "solid",
   },
+  folderButton: {
+    flexDirection: "row",
+    gap: 20,
+  },
   shared: {
     flexDirection: "row",
     display: "flex",
@@ -225,7 +267,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -246,21 +288,39 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
+  modalGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    alignItems: "center",
+    gap: 1,
+    // Optional, to add spacing between items if supported
+  },
+
   modalButton: {
+    width: "25%",
+    // Adjust as needed for two buttons per row
     padding: 10,
     borderRadius: 5,
-    backgroundColor: "#FA9884",
     marginVertical: 5,
+    alignItems: "center",
   },
+
   modalButtonText: {
-    color: "#FFF",
-    fontSize: 16,
+    color: "#000",
+    fontSize: 10,
     textAlign: "center",
   },
   closeModal: {
     textAlign: "center",
-    color: "#FA9884",
+    // color: "#FA9884",
+    color: "#fff",
+    backgroundColor: "#575353",
     marginTop: 15,
-    fontSize: 16,
+    width: "80%",
+    alignSelf: "center",
+    fontSize: 15,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
 });

@@ -40,7 +40,7 @@ const TabLayout = () => {
             ),
           }}
         />
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="search"
           options={{
             headerShown: false,
@@ -53,7 +53,7 @@ const TabLayout = () => {
               />
             ),
           }}
-        />
+        /> */}
 
         <Tabs.Screen
           name="folder"
