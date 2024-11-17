@@ -218,3 +218,75 @@ const styles = StyleSheet.create({
     marginTop: 130,
   },
 });
+
+// import React, { useEffect, useState } from "react";
+// import {
+//   View,
+//   FlatList,
+//   Text,
+//   TouchableOpacity,
+//   StyleSheet,
+//   Modal,
+// } from "react-native";
+// import { appwriteFetchFolders } from "../services/appwriteConfig";
+// import FolderModal from "../components/FolderModal";
+
+// export default function HomeScreen() {
+//   const [folders, setFolders] = useState([]);
+//   const [modalVisible, setModalVisible] = useState(false);
+//   const [selectedFolder, setSelectedFolder] = useState(null);
+
+//   useEffect(() => {
+//     const fetchFolders = async () => {
+//       try {
+//         const foldersData = await appwriteFetchFolders();
+//         setFolders(foldersData);
+//       } catch (error) {
+//         console.error("Error fetching folders:", error);
+//       }
+//     };
+//     fetchFolders();
+//   }, []);
+
+//   const handleFolderClick = (folder) => {
+//     setSelectedFolder(folder);
+//     setModalVisible(true);
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <FlatList
+//         data={folders}
+//         renderItem={({ item }) => (
+//           <TouchableOpacity
+//             style={styles.folderCard}
+//             onPress={() => handleFolderClick(item)}
+//           >
+//             <Text style={styles.folderName}>{item.name}</Text>
+//             <Text style={styles.folderSubtitle}>{item.subtitle}</Text>
+//           </TouchableOpacity>
+//         )}
+//         keyExtractor={(item) => item.$id}
+//       />
+//       {selectedFolder && (
+//         <FolderModal
+//           visible={modalVisible}
+//           onClose={() => setModalVisible(false)}
+//           folder={selectedFolder}
+//         />
+//       )}
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, padding: 16 },
+//   folderCard: {
+//     backgroundColor: "#f5f5f5",
+//     padding: 10,
+//     marginBottom: 12,
+//     borderRadius: 4,
+//   },
+//   folderName: { fontSize: 18, fontWeight: "bold" },
+//   folderSubtitle: { fontSize: 14, color: "gray" },
+// });

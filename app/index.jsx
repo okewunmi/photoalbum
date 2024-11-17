@@ -31,7 +31,7 @@ const Index = () => {
         <View style={styles.btnBox}>
           <TouchableOpacity
             style={styles.btnWhite}
-            onPress={() => router.push("/home")}
+            onPress={() => router.push("/sign-in")}
           >
             <Text style={styles.btn2}> Login</Text>
           </TouchableOpacity>

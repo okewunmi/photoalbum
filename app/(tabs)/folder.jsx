@@ -1,15 +1,3 @@
-// import React from "react";
-// import { Text, View } from "react-native";
-// const folder = () => {
-//   return (
-//     <View>
-//       <Text>folder</Text>
-//     </View>
-//   );
-// };
-
-// export default folder;
-
 import React, { useState } from "react";
 import {
   View,
@@ -17,12 +5,18 @@ import {
   Button,
   Alert,
   Image,
+  Text,
   StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { createFolder, uploadImage } from "../../lib/appwrite";
-
-const Folder = ({ navigation }) => {
+import {
+  createFolder,
+  uploadImage,
+  checkFolderExist,
+  getCurrentUser,
+} from "../../lib/appwrite";
+import { router } from "expo-router";
+const folder = ({ navigation }) => {
   const [folderName, setFolderName] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [folderImage, setFolderImage] = useState(null);
@@ -44,28 +38,59 @@ const Folder = ({ navigation }) => {
     }
   };
 
+  // const handleCreateFolder = async () => {
+  //   if (!folderName || !subtitle) {
+  //     // if (!folderName || !subtitle || !folderImage) {
+  //     Alert.alert("Please fill all the fields and select an image");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Upload the folder image to Appwrite storage
+  //     const imageFile = {
+  //       uri: folderImage,
+  //       type: "image/jpeg",
+  //       name: `${folderName}_image.jpg`,
+  //     };
+
+  //     const uploadedImage = await uploadImage(imageFile, null); // Passing null for folderId
+  //     const imageUrl = uploadedImage.fileUrl;
+
+  //     // Create the folder in Appwrite database
+  //     await createFolder(folderName, subtitle, imageUrl);
+
+  //     Alert.alert("Folder Created Successfully");
+  //     navigation.navigate("home"); // Redirect back to Home Screen
+  //   } catch (error) {
+  //     Alert.alert("Error creating folder", error.message);
+  //   }
+  // };
   const handleCreateFolder = async () => {
-    if (!folderName || !subtitle || !folderImage) {
-      Alert.alert("Please fill all the fields and select an image");
+    if (!folderName || !subtitle) {
+      Alert.alert("Please fill all the fields");
       return;
     }
 
     try {
-      // Upload the folder image to Appwrite storage
-      const imageFile = {
-        uri: folderImage,
-        type: "image/jpeg",
-        name: `${folderName}_image.jpg`,
-      };
+      // Check if the folder already exists
+      const folderExists = await checkFolderExist(folderName);
 
-      const uploadedImage = await uploadImage(imageFile, null); // Passing null for folderId
-      const imageUrl = uploadedImage.fileUrl;
+      if (folderExists) {
+        Alert.alert("Folder already exists", "Please choose a different name.");
+        return;
+      }
 
-      // Create the folder in Appwrite database
-      await createFolder(folderName, subtitle, imageUrl);
+      // Create the folder in Appwrite database without the background image
+
+      const currentUser = await getCurrentUser();
+      const createdBy = currentUser?.username || "Unknown User"; // Assuming the username is fetched from current user data
+
+      const newFolder = await createFolder(folderName, subtitle, createdBy);
 
       Alert.alert("Folder Created Successfully");
-      navigation.navigate("home"); // Redirect back to Home Screen
+      setFolderName("");
+      setSubtitle("");
+      router.push("/home"); // Redirect back to Home Screen
     } catch (error) {
       Alert.alert("Error creating folder", error.message);
     }
@@ -85,16 +110,16 @@ const Folder = ({ navigation }) => {
         onChangeText={setSubtitle}
         style={styles.input}
       />
-      <Button title="Pick Folder Image" onPress={pickFolderImage} />
+      {/* <Button title="Pick Folder Image" onPress={pickFolderImage} />
       {folderImage && (
         <Image source={{ uri: folderImage }} style={styles.imagePreview} />
-      )}
+      )} */}
       <Button title="Create Folder" onPress={handleCreateFolder} />
     </View>
   );
 };
 
-export default Folder;
+export default folder;
 
 const styles = StyleSheet.create({
   container: {
