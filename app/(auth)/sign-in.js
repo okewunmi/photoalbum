@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -6,14 +6,47 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { Link, router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import rightCornerImage from "../../assets/images/rightcorner.png";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { FcGoogle } from "react-icons/fc";
+import google from "../../assets/images/google.png";
+import facebook from "../../assets/images/facebook.png";
+import Linkedin from "../../assets/images/linkedin-icon.png";
+import { getCurrentUser, signIn } from "../../lib/appwrite";
 
-const signIn = () => {
+const SignIn = () => {
+  const [isSubmting, setIssubmtting] = useState(false);
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const submit = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert("Error", "Please fill in both email and password fields.");
+      console.log("form checked.");
+      return;
+    }
+
+    setIssubmtting(true);
+    console.log("setsubmiti is true.");
+
+    try {
+      const result = await getCurrentUser();
+      router.replace("/home");
+      console.log("Navigation to home page successful.");
+      return result;
+    } catch (error) {
+      Alert.alert(
+        "Login Failed",
+        error.message || "An error occurred. Please try again."
+      );
+    } finally {
+      setIssubmtting(false);
+    }
+  };
+
   return (
     <View style={styles.view}>
       <View style={styles.Boximg}>
@@ -28,10 +61,32 @@ const signIn = () => {
         <Text style={styles.txt2}>Enter Your Email And Password</Text>
 
         <View style={styles.boxinput}>
-          <TextInput style={styles.input} placeholder="Email" />
-          <TextInput style={styles.input} placeholder="Password" />
-          <TouchableOpacity style={styles.btn}>
-            <Text style={styles.btnTxt}>Login</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            title="Email"
+            value={form.email}
+            onChangeText={(e) => setForm({ ...form, email: e })}
+            keyboardType="email-address"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            title="Password"
+            value={form.password}
+            onChangeText={(e) => setForm({ ...form, password: e })}
+            secureTextEntry={true} // Add for password masking
+          />
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={submit}
+            disabled={isSubmting}
+          >
+            <Text style={styles.btnTxt}>
+              {isSubmting ? "Loging in ..." : "Login "}
+            </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.reg}>
@@ -46,13 +101,25 @@ const signIn = () => {
           <View style={styles.line}></View>
           <Text style={styles.linetxt}>Sign In with</Text>
         </View>
-        <View style={styles.auth}></View>
+
+        {/* other sign in options */}
+        <View style={styles.auth}>
+          <TouchableOpacity>
+            <Image source={google} style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Image source={facebook} style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Image source={Linkedin} style={styles.icon} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
-export default signIn;
+export default SignIn;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -69,7 +136,7 @@ const styles = StyleSheet.create({
   // },
   img: {
     height: 120,
-    width: 210,
+    width: 214,
   },
   boxtxt: {
     display: "flex",
@@ -89,7 +156,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   boxinput: {
-    marginTop: 50,
+    marginTop: 150,
     paddingHorizontal: 35,
     gap: 10,
     width: "100%",
@@ -98,8 +165,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderStyle: "solid",
     borderColor: "#A8A6A7",
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: 14,
+    fontWeight: "light",
     fontFamily: "Nunito",
   },
   btn: {
@@ -110,9 +177,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   btnTxt: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     fontFamily: "Nunito",
+    textTransform: "uppercase",
+    color: "#fff",
   },
   reg: {
     marginTop: 10,
@@ -143,5 +212,16 @@ const styles = StyleSheet.create({
     // zIndex: 100,
     backgroundColor: "#fff",
   },
-  auth: {},
+  auth: {
+    width: "100%",
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    gap: 30,
+    justifyContent: "center",
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
 });

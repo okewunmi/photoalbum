@@ -62,6 +62,47 @@ const Card = ({ post }) => {
     await Clipboard.setStringAsync("https://yourlink.com");
     Alert.alert("Link copied to clipboard!");
   };
+  const { name, subtitle, createdAt } = post;
+
+  //
+
+  function formatCreatedAt(createdAt) {
+    const now = new Date();
+    const createdAtDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now - createdAtDate) / 1000);
+
+    if (diffInSeconds < 60 * 60) {
+      // Less than 1 hour
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes}min${minutes > 1 ? "s" : ""} ago`;
+    } else if (diffInSeconds < 60 * 60 * 24 * 7) {
+      // Less than 7 days
+      const days = Math.floor(diffInSeconds / (60 * 60 * 24));
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (diffInSeconds < 60 * 60 * 24 * 30) {
+      // Less than 1 month
+      const weeks = Math.floor(diffInSeconds / (60 * 60 * 24 * 7));
+      return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+    } else if (diffInSeconds < 60 * 60 * 24 * 365) {
+      // Less than 1 year
+      const months = Math.floor(diffInSeconds / (60 * 60 * 24 * 30));
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      // More than 1 year
+      const years = Math.floor(diffInSeconds / (60 * 60 * 24 * 365));
+      return `${years} year${years > 1 ? "s" : ""} ago`;
+    }
+  }
+
+  // Example usage:
+  const apiResponse = {
+    createdAt: "2024-11-17T05:30:00Z", // Example timestamp from API
+  };
+
+  console.log(formatCreatedAt(apiResponse.createdAt));
+
+  //
+  const dateFormated = () => {};
 
   return (
     <>
@@ -70,10 +111,8 @@ const Card = ({ post }) => {
           <View style={styles.image}>
             {/* <View style={styles.bg}></View> */}
             <View>
-              <Text style={styles.txt1}>
-                {post.heading || "Fabrics Collections"}
-              </Text>
-              <Text style={styles.txt2}>{post.txt || "Classic Materials"}</Text>
+              <Text style={styles.txt1}>{name || "Fabrics Collections"}</Text>
+              <Text style={styles.txt2}>{subtitle || "Classic Materials"}</Text>
             </View>
           </View>
 
@@ -98,7 +137,9 @@ const Card = ({ post }) => {
         </View>
         <View style={styles.body}></View>
         <View style={styles.bottom}>
-          <Text style={styles.txt3}>30 mins ago</Text>
+          <Text style={styles.txt3}>
+            {formatCreatedAt(createdAt) || "30 mins"}
+          </Text>
           <View style={styles.shared}>
             <FontAwesome name="send" size={20} color="#575353" />
             <Text style={styles.txt3}>3</Text>

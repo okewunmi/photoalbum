@@ -40,31 +40,68 @@ const folder = ({ navigation }) => {
 
   // const handleCreateFolder = async () => {
   //   if (!folderName || !subtitle) {
-  //     // if (!folderName || !subtitle || !folderImage) {
-  //     Alert.alert("Please fill all the fields and select an image");
+  //     Alert.alert("Please fill all the fields");
   //     return;
   //   }
 
   //   try {
-  //     // Upload the folder image to Appwrite storage
-  //     const imageFile = {
-  //       uri: folderImage,
-  //       type: "image/jpeg",
-  //       name: `${folderName}_image.jpg`,
-  //     };
+  //     // Check if the folder already exists
+  //     const folderExists = await checkFolderExist(folderName);
 
-  //     const uploadedImage = await uploadImage(imageFile, null); // Passing null for folderId
-  //     const imageUrl = uploadedImage.fileUrl;
+  //     if (folderExists) {
+  //       Alert.alert("Folder already exists", "Please choose a different name.");
+  //       return;
+  //     }
 
-  //     // Create the folder in Appwrite database
-  //     await createFolder(folderName, subtitle, imageUrl);
+  //     // Create the folder in Appwrite database without the background image
+
+  //     const currentUser = await getCurrentUser();
+  //     const createdBy = currentUser?.username || "Unknown User"; // Assuming the username is fetched from current user data
+
+  //     const newFolder = await createFolder(folderName, subtitle, createdBy);
 
   //     Alert.alert("Folder Created Successfully");
-  //     navigation.navigate("home"); // Redirect back to Home Screen
+  //     setFolderName("");
+  //     setSubtitle("");
+  //     router.push("/home"); // Redirect back to Home Screen
+  //     return newFolder;
   //   } catch (error) {
   //     Alert.alert("Error creating folder", error.message);
   //   }
   // };
+
+  // const handleCreateFolder = async () => {
+  //   if (!folderName || !subtitle) {
+  //     Alert.alert("Please fill all the fields");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Check if the folder already exists
+  //     const folderExists = await checkFolderExist(folderName);
+
+  //     if (folderExists) {
+  //       Alert.alert("Folder already exists", "Please choose a different name.");
+  //       return;
+  //     }
+
+  //     // Fetch the current user's username
+  //     const currentUser = await getCurrentUser();
+  //     const createdBy = currentUser?.username || "Unknown User"; // Fallback to 'Unknown User'
+
+  //     // Create the folder in Appwrite database with the createdBy field
+  //     const newFolder = await createFolder(folderName, subtitle, createdBy);
+
+  //     Alert.alert("Folder Created Successfully");
+  //     setFolderName("");
+  //     setSubtitle("");
+  //     router.push("/home"); // Redirect back to Home Screen
+  //     return newFolder;
+  //   } catch (error) {
+  //     Alert.alert("Error creating folder", error.message);
+  //   }
+  // };
+
   const handleCreateFolder = async () => {
     if (!folderName || !subtitle) {
       Alert.alert("Please fill all the fields");
@@ -80,17 +117,21 @@ const folder = ({ navigation }) => {
         return;
       }
 
-      // Create the folder in Appwrite database without the background image
-
+      // Fetch the current user's username
       const currentUser = await getCurrentUser();
-      const createdBy = currentUser?.username || "Unknown User"; // Assuming the username is fetched from current user data
+      const createdBy = currentUser?.username || "Unknown User";
 
+      // Create the folder
       const newFolder = await createFolder(folderName, subtitle, createdBy);
 
-      Alert.alert("Folder Created Successfully");
+      Alert.alert(
+        "Folder Created Successfully",
+        `Folder ID: ${newFolder.folderId}`
+      );
       setFolderName("");
       setSubtitle("");
       router.push("/home"); // Redirect back to Home Screen
+      return newFolder;
     } catch (error) {
       Alert.alert("Error creating folder", error.message);
     }

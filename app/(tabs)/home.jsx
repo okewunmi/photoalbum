@@ -1,33 +1,26 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FlatList,
   Image,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Button,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import AntDesign from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import Card from "../../components/card";
 import Shared from "../../components/shared";
 import dash from "../../assets/images/dash.png";
-import Person9 from "../../assets/images/person.jpeg";
-import Person8 from "../../assets/images/person1.jpeg";
-import Person7 from "../../assets/images/person2.jpeg";
-import Person6 from "../../assets/images/person3.jpeg";
-import Person5 from "../../assets/images/person4.jpeg";
-import Person4 from "../../assets/images/person5.jpeg";
 import Person3 from "../../assets/images/person6.jpeg";
 import Person2 from "../../assets/images/person7.jpeg";
 import Person1 from "../../assets/images/person8.jpeg";
-import add from "../../assets/images/add.png";
+
+import { getCurrentUser, fetchFolders } from "@/lib/appwrite";
+
 const home = () => {
   const DUMMY_DATA = [
     {
@@ -80,10 +73,52 @@ const home = () => {
       // image: Person7,
     },
   ];
+  const [folder, setFolder] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+
+        if (currentUser && currentUser.username) {
+          setUserName(currentUser.username);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error.message);
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const currentUser = await getCurrentUser();
+
+        if (currentUser && currentUser.username) {
+          setUserName(currentUser.username);
+        }
+
+        const fetchedFolders = await fetchFolders();
+
+        setFolder(fetchedFolders);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
-        data={DUMMY_DATA}
+        data={folder}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.headercard}>
@@ -94,7 +129,7 @@ const home = () => {
           <View style={styles.Listheader}>
             <View style={styles.head}>
               <View>
-                <Text style={styles.welcome}>Hi, Adekunle</Text>
+                <Text style={styles.welcome}>Hi, {userName}</Text>
               </View>
               <TouchableOpacity>
                 <Image source={dash} resizeMode="contain" size={20} />
@@ -111,11 +146,11 @@ const home = () => {
               </Pressable>
             </TouchableOpacity>
             <View style={styles.shared}>
-              <Text style={styles.sharedtxt}>Recently Uploaded</Text>
+              <Text style={styles.sharedtxt}>Recent Photos</Text>
               <Shared />
             </View>
             <View style={styles.ListFolder}>
-              <Text style={styles.sharedtxt}>All Folders</Text>
+              <Text style={styles.sharedtxt}>Latest Folder</Text>
             </View>
           </View>
         )}
@@ -135,19 +170,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   Listheader: {
+    paddingTop: 30,
     paddingHorizontal: 25,
   },
   shared: {
     display: "flex",
-    paddingVertical: 20,
+    paddingTop: 30,
+    paddingBottom: 15,
+    borderBottomColor: "#dbdbdb",
+    borderBottomWidth: 1,
+    borderStyle: "solid",
+
     // flexDirection: "row",
   },
   sharedtxt: {
     paddingBottom: 18,
     fontFamily: "Helvetica",
-    fontSize: 15,
-    fontWeight: "bold",
-    // color: "#575353",
+    fontSize: 16,
+    paddingLeft: 15,
+
+    color: "#7b7676",
+  },
+
+  ListFolder: {
+    paddingTop: 30,
   },
   welcome: {
     fontFamily: "inter",
@@ -160,7 +206,7 @@ const styles = StyleSheet.create({
     height: 37,
     borderStyle: "solid",
     borderWidth: 1,
-    borderColor: "#000",
+    borderColor: "#575353",
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "space-between",
@@ -218,75 +264,3 @@ const styles = StyleSheet.create({
     marginTop: 130,
   },
 });
-
-// import React, { useEffect, useState } from "react";
-// import {
-//   View,
-//   FlatList,
-//   Text,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Modal,
-// } from "react-native";
-// import { appwriteFetchFolders } from "../services/appwriteConfig";
-// import FolderModal from "../components/FolderModal";
-
-// export default function HomeScreen() {
-//   const [folders, setFolders] = useState([]);
-//   const [modalVisible, setModalVisible] = useState(false);
-//   const [selectedFolder, setSelectedFolder] = useState(null);
-
-//   useEffect(() => {
-//     const fetchFolders = async () => {
-//       try {
-//         const foldersData = await appwriteFetchFolders();
-//         setFolders(foldersData);
-//       } catch (error) {
-//         console.error("Error fetching folders:", error);
-//       }
-//     };
-//     fetchFolders();
-//   }, []);
-
-//   const handleFolderClick = (folder) => {
-//     setSelectedFolder(folder);
-//     setModalVisible(true);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <FlatList
-//         data={folders}
-//         renderItem={({ item }) => (
-//           <TouchableOpacity
-//             style={styles.folderCard}
-//             onPress={() => handleFolderClick(item)}
-//           >
-//             <Text style={styles.folderName}>{item.name}</Text>
-//             <Text style={styles.folderSubtitle}>{item.subtitle}</Text>
-//           </TouchableOpacity>
-//         )}
-//         keyExtractor={(item) => item.$id}
-//       />
-//       {selectedFolder && (
-//         <FolderModal
-//           visible={modalVisible}
-//           onClose={() => setModalVisible(false)}
-//           folder={selectedFolder}
-//         />
-//       )}
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, padding: 16 },
-//   folderCard: {
-//     backgroundColor: "#f5f5f5",
-//     padding: 10,
-//     marginBottom: 12,
-//     borderRadius: 4,
-//   },
-//   folderName: { fontSize: 18, fontWeight: "bold" },
-//   folderSubtitle: { fontSize: 14, color: "gray" },
-// });
