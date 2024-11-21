@@ -26,7 +26,6 @@ const home = () => {
   const [folder, setFolder] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
-
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -45,7 +44,6 @@ const home = () => {
     const fetchUserName = async () => {
       try {
         const currentUser = await getCurrentUser();
-
         if (currentUser && currentUser.username) {
           setUserName(currentUser.username);
         }
@@ -88,7 +86,7 @@ const home = () => {
           <View style={styles.headercard}>
             <Link
               href={{
-                pathname: "/details/[folderId]",
+                pathname: "[folderId]",
                 params: { folderId: item.$id },
               }}
             >
@@ -209,6 +207,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 15,
   },
   head: {
     display: "flex",

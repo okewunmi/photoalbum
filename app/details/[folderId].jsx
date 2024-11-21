@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { fetchFolderDetails } from "../../lib/appwrite";
 import { StyleSheet, View, Text } from "react-native";
@@ -29,10 +30,9 @@ const FolderDetails = () => {
     </View>
   );
 };
-
 export default FolderDetails;
 
-const styles = StyleSheet({
+const styles = StyleSheet.create({
   box: {
     flex: 1,
   },

@@ -100,23 +100,24 @@ const styles = StyleSheet.create({
   },
   box: {
     alignSelf: "flex-start",
-    paddingLeft: 10,
+    paddingLeft: 20,
     // marginVertical: 25,
   },
 
   circle: {
-    width: 65,
-    height: 65,
-    borderRadius: 65 / 2,
-    borderWidth: 3,
-    borderColor: "#FA9884",
+    width: 190,
+    height: 200,
+    borderRadius: 15,
+    // borderRadius: 65 / 2,
+    // borderWidth: 2,
+    // borderColor: "#FA9884",
     overflow: "hidden",
   },
   img: {
     width: "100%",
     height: "100%",
-    borderRadius: 65 / 2,
-    borderWidth: 3,
-    borderColor: "#f5f5f5",
+    // borderRadius: 65 / 2,
+    // borderWidth: 3,
+    // borderColor: "#f5f5f5",
   },
 });

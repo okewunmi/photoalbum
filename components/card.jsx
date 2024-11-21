@@ -106,25 +106,6 @@ const Card = ({ post }) => {
               <Text style={styles.txt2}>{subtitle || "Classic Materials"}</Text>
             </View>
           </View>
-
-          {/* <View style={styles.folderButton}>
-            <Pressable>
-              <FontAwesome
-                name="folder-open"
-                size={24}
-                color="#575353"
-                // onPress={onPress}
-              />
-            </Pressable>
-            <Pressable>
-              <Entypo
-                name="share"
-                size={22}
-                color="#575353"
-                onPress={() => setModalVisible(true)}
-              />
-            </Pressable>
-          </View> */}
         </View>
         <View style={styles.body}></View>
         <View style={styles.bottom}>

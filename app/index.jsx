@@ -19,7 +19,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import welcome from "../assets/images/welcome.png";
 import { useGlobalContext } from "../ContextFile/GlobalProvider";
 
-
 const Index = () => {
   const { isLoggedIn, loading } = useGlobalContext();
   if (!loading && !isLoggedIn) return <Redirect href="/sign-in" />;
@@ -46,7 +45,7 @@ const Index = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <StatusBar backgroundColor="#ffff" style="light" />
+      <StatusBar backgroundColor="#ffff" style="dark" />
     </SafeAreaView>
   );
 };
