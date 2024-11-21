@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
   View,
 } from "react-native";
 
@@ -18,64 +19,27 @@ import dash from "../../assets/images/dash.png";
 import Person3 from "../../assets/images/person6.jpeg";
 import Person2 from "../../assets/images/person7.jpeg";
 import Person1 from "../../assets/images/person8.jpeg";
-
+import { router, Redirect, Link } from "expo-router";
 import { getCurrentUser, fetchFolders } from "@/lib/appwrite";
 
 const home = () => {
-  const DUMMY_DATA = [
-    {
-      id: "1",
-      heading: "Traditional Atires",
-      txt: "For men and women",
-      image: Person1,
-    },
-    {
-      id: "2",
-      heading: "Fabrics Collection",
-      txt: "Casual wears for all",
-      image: Person2,
-    },
-    {
-      id: "3",
-      heading: "Fabrics Collection",
-      txt: "Casual for men and women",
-      image: Person3,
-    },
-    {
-      id: "4",
-      heading: "Fabrics Collection",
-      txt: "Casual for men and women",
-      // image: Person4,
-    },
-    {
-      id: "5",
-      heading: "Fabrics Collection",
-      txt: "Casual for men and women",
-
-      // image: Person4,
-    },
-    {
-      id: "6",
-      heading: "Fabrics Collection",
-      txt: "Casual for men and women",
-      // image: Person5,
-    },
-    {
-      id: "7",
-      heading: "Fabrics Collection",
-      txt: "Casual for men and women",
-      // image: Person6,
-    },
-    {
-      id: "8",
-      heading: "Fabrics Collection",
-      txt: "Casual wears for men and women",
-      // image: Person7,
-    },
-  ];
   const [folder, setFolder] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const fetchedFolders = await fetchFolders();
+      setFolder(fetchedFolders); // Update the folder state
+    } catch (error) {
+      console.error("Error refreshing folders:", error.message);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -118,11 +82,18 @@ const home = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
-        data={folder}
-        keyExtractor={(item) => item.id}
+        data={folder || []}
+        keyExtractor={(item) => item.$id.toString()}
         renderItem={({ item }) => (
           <View style={styles.headercard}>
-            <Card post={item} />
+            <Link
+              href={{
+                pathname: "/details/[folderId]",
+                params: { folderId: item.$id },
+              }}
+            >
+              <Card post={item} />
+            </Link>
           </View>
         )}
         ListHeaderComponent={() => (
@@ -154,6 +125,16 @@ const home = () => {
             </View>
           </View>
         )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={
+          !loading && (
+            <Text style={{ textAlign: "center", marginTop: 20 }}>
+              No folders available.
+            </Text>
+          )
+        }
       />
     </SafeAreaView>
   );

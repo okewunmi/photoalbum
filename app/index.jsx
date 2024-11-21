@@ -17,10 +17,12 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import welcome from "../assets/images/welcome.png";
+import { useGlobalContext } from "../ContextFile/GlobalProvider";
 
-// import { useGlobalContext } from "../ContextFile/GlobalProvider";
 
 const Index = () => {
+  const { isLoggedIn, loading } = useGlobalContext();
+  if (!loading && !isLoggedIn) return <Redirect href="/sign-in" />;
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.Box}>

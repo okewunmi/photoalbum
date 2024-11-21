@@ -62,53 +62,44 @@ const Card = ({ post }) => {
     await Clipboard.setStringAsync("https://yourlink.com");
     Alert.alert("Link copied to clipboard!");
   };
-  const { name, subtitle, createdAt } = post;
 
-  //
+  const { name, subtitle, createdAt, id } = post;
 
   function formatCreatedAt(createdAt) {
     const now = new Date();
     const createdAtDate = new Date(createdAt);
     const diffInSeconds = Math.floor((now - createdAtDate) / 1000);
 
-    if (diffInSeconds < 60 * 60) {
-      // Less than 1 hour
-      const minutes = Math.floor(diffInSeconds / 60);
-      return `${minutes}min${minutes > 1 ? "s" : ""} ago`;
-    } else if (diffInSeconds < 60 * 60 * 24 * 7) {
-      // Less than 7 days
-      const days = Math.floor(diffInSeconds / (60 * 60 * 24));
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    } else if (diffInSeconds < 60 * 60 * 24 * 30) {
-      // Less than 1 month
-      const weeks = Math.floor(diffInSeconds / (60 * 60 * 24 * 7));
-      return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
-    } else if (diffInSeconds < 60 * 60 * 24 * 365) {
-      // Less than 1 year
-      const months = Math.floor(diffInSeconds / (60 * 60 * 24 * 30));
-      return `${months} month${months > 1 ? "s" : ""} ago`;
-    } else {
-      // More than 1 year
-      const years = Math.floor(diffInSeconds / (60 * 60 * 24 * 365));
-      return `${years} year${years > 1 ? "s" : ""} ago`;
+    const units = [
+      { label: "year", seconds: 60 * 60 * 24 * 365 },
+      { label: "month", seconds: 60 * 60 * 24 * 30 },
+      { label: "week", seconds: 60 * 60 * 24 * 7 },
+      { label: "day", seconds: 60 * 60 * 24 },
+      { label: "hour", seconds: 60 * 60 },
+      { label: "minute", seconds: 60 },
+    ];
+
+    for (const unit of units) {
+      const count = Math.floor(diffInSeconds / unit.seconds);
+      if (count > 0) {
+        return `${count} ${unit.label}${count > 1 ? "s" : ""} ago`;
+      }
     }
+
+    return "just now";
   }
-
-  // Example usage:
-  const apiResponse = {
-    createdAt: "2024-11-17T05:30:00Z", // Example timestamp from API
-  };
-
-  console.log(formatCreatedAt(apiResponse.createdAt));
-
-  //
-  const dateFormated = () => {};
 
   return (
     <>
       <View style={styles.card}>
         <View style={styles.head}>
           <View style={styles.image}>
+            {/* <LinearGradient
+              colors={["#c17388", "#90306f"]}
+              style={{ flex: 1 }}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            /> */}
             {/* <View style={styles.bg}></View> */}
             <View>
               <Text style={styles.txt1}>{name || "Fabrics Collections"}</Text>
@@ -116,13 +107,13 @@ const Card = ({ post }) => {
             </View>
           </View>
 
-          <View style={styles.folderButton}>
+          {/* <View style={styles.folderButton}>
             <Pressable>
               <FontAwesome
                 name="folder-open"
                 size={24}
                 color="#575353"
-                onPress={() => console.log("open folder")}
+                // onPress={onPress}
               />
             </Pressable>
             <Pressable>
@@ -133,7 +124,7 @@ const Card = ({ post }) => {
                 onPress={() => setModalVisible(true)}
               />
             </Pressable>
-          </View>
+          </View> */}
         </View>
         <View style={styles.body}></View>
         <View style={styles.bottom}>
@@ -141,7 +132,7 @@ const Card = ({ post }) => {
             {formatCreatedAt(createdAt) || "30 mins"}
           </Text>
           <View style={styles.shared}>
-            <FontAwesome name="send" size={20} color="#575353" />
+            <FontAwesome name="image" size={20} color="#575353" />
             <Text style={styles.txt3}>3</Text>
           </View>
         </View>
@@ -220,7 +211,7 @@ const styles = StyleSheet.create({
     width: 310,
     height: 300,
     backgroundColor: "#FCFCFC",
-    borderRadius: 20,
+    borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 20,
     display: "flex",
@@ -290,13 +281,13 @@ const styles = StyleSheet.create({
   shared: {
     flexDirection: "row",
     display: "flex",
-    gap: 10,
+    gap: 5,
     alignItems: "center",
   },
   body: {
     width: "100%",
     height: "70%",
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: "#4531b9",
   },
   bottom: {
