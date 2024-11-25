@@ -7,22 +7,22 @@ const FolderDetails = () => {
   const { folderId } = useLocalSearchParams();
   const [folder, setFolder] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchDetails = async () => {
-  //     try {
-  //       const details = await fetchFolderDetails(folderId);
-  //       setFolder(details);
-  //     } catch (error) {
-  //       console.error("Error fetching folder details:", error.message);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const details = await fetchFolderDetails(folderId);
+        setFolder(details);
+      } catch (error) {
+        console.error("Error fetching folder details:", error.message);
+      }
+    };
 
-  //   if (folderId) fetchDetails();
-  // }, [folderId]);
+    if (folderId) fetchDetails();
+  }, [folderId]);
 
-  // if (!folder) {
-  //   return <Text>Loading folder details...</Text>;
-  // }
+  if (!folder) {
+    return <Text>Loading folder details...</Text>;
+  }
 
   return (
     <View style={styles.box}>

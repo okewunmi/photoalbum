@@ -81,12 +81,12 @@ const home = () => {
     <SafeAreaView style={styles.safeArea}>
       <FlatList
         data={folder || []}
-        keyExtractor={(item) => item.$id.toString()}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.headercard}>
+          <View style={styles.headercard} key={item.$id}>
             <Link
               href={{
-                pathname: "[folderId]",
+                pathname: "/details/[folderId]",
                 params: { folderId: item.$id },
               }}
             >
@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     fontSize: 16,
     paddingLeft: 15,
-
     color: "#7b7676",
   },
 

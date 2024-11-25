@@ -28,6 +28,7 @@
     },
     "plugins": [
       "expo-router",
+      
       [
         "expo-splash-screen",
         {
@@ -36,6 +37,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+        
       ]
     ],
     "experiments": {
