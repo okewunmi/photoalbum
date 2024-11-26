@@ -647,6 +647,213 @@
 
 // export default CreateFolder;
 
+// import React, { useState } from "react";
+// import {
+//   View,
+//   TextInput,
+//   Button,
+//   Image,
+//   Alert,
+//   ActivityIndicator,
+// } from "react-native";
+// import * as ImagePicker from "expo-image-picker";
+// import * as FileSystem from "expo-file-system";
+// import { createFolders, uploads } from "../../lib/appwrite";
+// import { useRouter, router } from "expo-router"; // Updated to use the latest hooks for routing
+
+// const CreateFolder = () => {
+//   const [name, setName] = useState("");
+//   const [subtitle, setSubtitle] = useState("");
+//   const [selectedImages, setSelectedImages] = useState([]);
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const prepareImageFile = async (imageUri) => {
+//     try {
+//       // Get file info
+//       const fileInfo = await FileSystem.getInfoAsync(imageUri);
+
+//       // Read the file as base64
+//       const base64 = await FileSystem.readAsStringAsync(imageUri, {
+//         encoding: FileSystem.EncodingType.Base64,
+//       });
+
+//       return {
+//         uri: imageUri,
+//         type: "image/jpeg",
+//         name: `image-${Date.now()}.jpg`,
+//         size: fileInfo.size,
+//         base64: base64,
+//       };
+//     } catch (error) {
+//       console.error("Error preparing image:", error);
+//       throw error;
+//     }
+//   };
+
+//   const handleCreate = async () => {
+//     if (!name || !subtitle) {
+//       Alert.alert("Validation Error", "Please fill all the fields.");
+//       return;
+//     }
+
+//     setIsLoading(true);
+
+//     try {
+//       // Create the folder
+//       const folder = await createFolders(name, subtitle);
+
+//       if (!folder || !folder.$id) {
+//         throw new Error("Failed to create folder properly");
+//       }
+
+//       console.log("Folder created:", folder);
+
+//       // Upload images if any are selected
+//       if (selectedImages.length > 0) {
+//         try {
+//           // Prepare image files with proper format
+//           const imageFiles = await Promise.all(
+//             selectedImages.map(async (image) => {
+//               return await prepareImageFile(image.uri);
+//             })
+//           );
+
+//           // Upload the prepared images
+//           await uploads(folder.$id, imageFiles);
+//           console.log("Images uploaded successfully");
+//         } catch (uploadError) {
+//           console.error("Error uploading images:", uploadError);
+//           Alert.alert(
+//             "Partial Success",
+//             "Folder created but failed to upload some images."
+//           );
+//         }
+//       }
+
+//       // Reset form
+//       setName("");
+//       setSubtitle("");
+//       setSelectedImages([]);
+
+//       Alert.alert("Success", "Folder created successfully!", [
+//         {
+//           text: "OK",
+//           onPress: () => router.push("/home"),
+//         },
+//       ]);
+//     } catch (error) {
+//       console.error("Error in handleCreate:", error);
+//       Alert.alert(
+//         "Error",
+//         error.message || "Failed to create folder. Please try again."
+//       );
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const pickImages = async () => {
+//     try {
+//       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+//       if (permissionResult.granted === false) {
+//         Alert.alert(
+//           "Permission Required",
+//           "Permission to access camera roll is required!"
+//         );
+//         return;
+//       }
+
+//       const result = await ImagePicker.launchImageLibraryAsync({
+//         mediaTypes: ImagePicker.MediaType.Images,
+//         allowsMultipleSelection: true,
+//         quality: 1,
+//         base64: true,
+//       });
+
+//       if (!result.canceled) {
+//         setSelectedImages(result.assets);
+//       }
+//     } catch (error) {
+//       Alert.alert("Error", "Failed to pick images");
+//       console.error("Error picking images:", error);
+//     }
+//   };
+
+//   // ... rest of the component remains the same ...
+//   return (
+//     <View style={styles.container}>
+//       <TextInput
+//         placeholder="Folder Name"
+//         value={name}
+//         onChangeText={setName}
+//         style={styles.input}
+//         editable={!isLoading}
+//       />
+//       <TextInput
+//         placeholder="Subtitle"
+//         value={subtitle}
+//         onChangeText={setSubtitle}
+//         style={styles.input}
+//         editable={!isLoading}
+//       />
+//       <Button title="Pick Images" onPress={pickImages} disabled={isLoading} />
+
+//       <View style={styles.imageGrid}>
+//         {selectedImages.map((image, index) => (
+//           <Image
+//             key={index}
+//             source={{ uri: image.uri }}
+//             style={styles.thumbnail}
+//           />
+//         ))}
+//       </View>
+
+//       {isLoading ? (
+//         <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+//       ) : (
+//         <Button
+//           title="Create Folder"
+//           onPress={handleCreate}
+//           disabled={!name || !subtitle}
+//         />
+//       )}
+//     </View>
+//   );
+// };
+
+// export default CreateFolder;
+// const styles = {
+//   container: {
+//     marginTop: 50,
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: "#fff",
+//   },
+//   input: {
+//     marginBottom: 10,
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 5,
+//     padding: 10,
+//   },
+//   imageGrid: {
+//     flexDirection: "row",
+//     flexWrap: "wrap",
+//     marginVertical: 10,
+//   },
+//   thumbnail: {
+//     width: 95,
+//     height: 100,
+//     margin: 5,
+//     borderRadius: 5,
+//   },
+//   loader: {
+//     marginVertical: 20,
+//   },
+// };
+
+// components/CreateFolder.js
 import React, { useState } from "react";
 import {
   View,
@@ -655,81 +862,152 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import { createFolders, uploads } from "../../lib/appwrite";
+import { createFolders, uploadss, MainUpload } from "../../lib/appwrite";
+import { useRouter, router } from "expo-router";
 
 const CreateFolder = () => {
   const [name, setName] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const prepareImageFile = async (imageUri) => {
+  // const pickImages = async () => {
+  //   try {
+  //     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+  //     if (!permissionResult.granted) {
+  //       Alert.alert(
+  //         "Permission Required",
+  //         "Please grant camera roll access to continue"
+  //       );
+  //       return;
+  //     }
+
+  //     const result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ["images"],
+  //       allowsMultipleSelection: true,
+  //       quality: 1,
+  //     });
+
+  //     if (!result.canceled && result.assets) {
+  //       setSelectedImages(result.assets);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error picking images:", error);
+  //     Alert.alert("Error", "Failed to pick images");
+  //   }
+  // };
+
+  // const handleCreate = async () => {
+  //   if (!name.trim() || !subtitle.trim()) {
+  //     Alert.alert("Required Fields", "Please fill in all fields");
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   try {
+  //     // Create folder
+  //     const folder = await createFolders(name, subtitle);
+  //     console.log("Folder created:", folder);
+
+  //     // Upload images if selected
+  //     if (selectedImages.length > 0) {
+  //       try {
+  //         const imageFiles = selectedImages.map((image) => ({
+  //           uri: image.uri,
+  //           name: `image-${Date.now()}.jpg`,
+  //           type: "image/jpeg",
+  //         }));
+
+  //         await uploadss(folder.$id, imageFiles);
+  //         console.log("Images uploaded successfully");
+  //       } catch (uploadError) {
+  //         console.error("Upload error:", uploadError);
+  //         Alert.alert(
+  //           "Partial Success",
+  //           "Folder created but some images failed to upload"
+  //         );
+  //       }
+  //     }
+
+  //     // Reset form
+  //     setName("");
+  //     setSubtitle("");
+  //     setSelectedImages([]);
+
+  //     Alert.alert("Success", "Folder created successfully!", [
+  //       {
+  //         text: "OK",
+  //         onPress: () => router.push("/home"),
+  //       },
+  //     ]);
+  //   } catch (error) {
+  //     console.error("Create folder error:", error);
+  //     Alert.alert("Error", "Failed to create folder. Please try again.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const pickImages = async () => {
     try {
-      // Get file info
-      const fileInfo = await FileSystem.getInfoAsync(imageUri);
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      // Read the file as base64
-      const base64 = await FileSystem.readAsStringAsync(imageUri, {
-        encoding: FileSystem.EncodingType.Base64,
+      if (!permissionResult.granted) {
+        Alert.alert(
+          "Permission Required",
+          "Please grant camera roll access to continue"
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: true,
+        quality: 1,
       });
 
-      return {
-        uri: imageUri,
-        type: "image/jpeg",
-        name: `image-${Date.now()}.jpg`,
-        size: fileInfo.size,
-        base64: base64,
-      };
+      if (!result.canceled && result.assets) {
+        setSelectedImages(result.assets);
+      }
     } catch (error) {
-      console.error("Error preparing image:", error);
-      throw error;
+      console.error("Error picking images:", error);
+      Alert.alert("Error", "Failed to pick images");
     }
   };
 
   const handleCreate = async () => {
-    if (!name || !subtitle) {
-      Alert.alert("Validation Error", "Please fill all the fields.");
+    if (!name.trim() || !subtitle.trim()) {
+      Alert.alert("Required Fields", "Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Create the folder
+      // Create a new folder
       const folder = await createFolders(name, subtitle);
-
-      if (!folder || !folder.$id) {
-        throw new Error("Failed to create folder properly");
-      }
-
       console.log("Folder created:", folder);
 
-      // Upload images if any are selected
+      // Check if there are selected images
       if (selectedImages.length > 0) {
-        try {
-          // Prepare image files with proper format
-          const imageFiles = await Promise.all(
-            selectedImages.map(async (image) => {
-              return await prepareImageFile(image.uri);
-            })
-          );
+        const imageFiles = selectedImages.map((image) => ({
+          uri: image.uri,
+          name: `image-${Date.now()}.jpg`,
+          type: "image/jpeg",
+        }));
 
-          // Upload the prepared images
-          await uploads(folder.$id, imageFiles);
-          console.log("Images uploaded successfully");
-        } catch (uploadError) {
-          console.error("Error uploading images:", uploadError);
-          Alert.alert(
-            "Partial Success",
-            "Folder created but failed to upload some images."
-          );
-        }
+        // Upload images to the created folder
+        await MainUpload(folder.$id, imageFiles);
+        console.log("Images uploaded successfully");
       }
 
-      // Reset form
+      // Reset form fields
       setName("");
       setSubtitle("");
       setSelectedImages([]);
@@ -737,65 +1015,38 @@ const CreateFolder = () => {
       Alert.alert("Success", "Folder created successfully!", [
         {
           text: "OK",
-          onPress: () => router.push("/home"),
+          onPress: () => router.push("/home"), // Navigate to the home screen
         },
       ]);
     } catch (error) {
-      console.error("Error in handleCreate:", error);
+      console.error("Error during folder creation or upload:", error);
       Alert.alert(
         "Error",
-        error.message || "Failed to create folder. Please try again."
+        "Failed to create folder or upload images. Please try again."
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const pickImages = async () => {
-    try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (permissionResult.granted === false) {
-        Alert.alert(
-          "Permission Required",
-          "Permission to access camera roll is required!"
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true,
-        quality: 1,
-        base64: true,
-      });
-
-      if (!result.canceled) {
-        setSelectedImages(result.assets);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to pick images");
-      console.error("Error picking images:", error);
-    }
-  };
-
-  // ... rest of the component remains the same ...
   return (
     <View style={styles.container}>
       <TextInput
+        style={styles.input}
         placeholder="Folder Name"
         value={name}
         onChangeText={setName}
-        style={styles.input}
         editable={!isLoading}
       />
+
       <TextInput
+        style={styles.input}
         placeholder="Subtitle"
         value={subtitle}
         onChangeText={setSubtitle}
-        style={styles.input}
         editable={!isLoading}
       />
+
       <Button title="Pick Images" onPress={pickImages} disabled={isLoading} />
 
       <View style={styles.imageGrid}>
@@ -809,20 +1060,19 @@ const CreateFolder = () => {
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <Button
           title="Create Folder"
           onPress={handleCreate}
-          disabled={!name || !subtitle}
+          disabled={!name.trim() || !subtitle.trim()}
         />
       )}
     </View>
   );
 };
 
-export default CreateFolder;
-const styles = {
+const styles = StyleSheet.create({
   container: {
     marginTop: 50,
     flex: 1,
@@ -830,11 +1080,12 @@ const styles = {
     backgroundColor: "#fff",
   },
   input: {
-    marginBottom: 10,
+    height: 40,
+    borderColor: "gray",
     borderWidth: 1,
-    borderColor: "#ccc",
+    marginBottom: 10,
+    paddingHorizontal: 10,
     borderRadius: 5,
-    padding: 10,
   },
   imageGrid: {
     flexDirection: "row",
@@ -842,12 +1093,11 @@ const styles = {
     marginVertical: 10,
   },
   thumbnail: {
-    width: 95,
+    width: 100,
     height: 100,
     margin: 5,
     borderRadius: 5,
   },
-  loader: {
-    marginVertical: 20,
-  },
-};
+});
+
+export default CreateFolder;
