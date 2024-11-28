@@ -32,7 +32,10 @@ const RootLayout = () => {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="details/[folderId]" />
+        <Stack.Screen
+          name="details/[folderId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </GlobalProvider>
   );

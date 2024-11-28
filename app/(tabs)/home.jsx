@@ -79,7 +79,7 @@ const home = () => {
   }, []);
   return (
     <SafeAreaView style={styles.safeArea}>
-      <FlatList
+      {/* <FlatList
         data={folder || []}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
@@ -133,7 +133,7 @@ const home = () => {
             </Text>
           )
         }
-      />
+      /> */}
     </SafeAreaView>
   );
 };

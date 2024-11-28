@@ -6,14 +6,17 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
-  Pressable,
+  Alert,
 } from "react-native";
 import { Link, router } from "expo-router";
 import rightCornerImage from "../../assets/images/rightcorner.png";
 import google from "../../assets/images/google.png";
 import facebook from "../../assets/images/facebook.png";
 import Linkedin from "../../assets/images/linkedin-icon.png";
-import { getCurrentUser, signIn } from "../../lib/appwrite";
+
+import { auth } from "../../lib/firebase";
+// import authConfig from "../../lib/authConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const SignIn = () => {
   const [isSubmting, setIssubmtting] = useState(false);
@@ -30,10 +33,12 @@ const SignIn = () => {
     }
 
     setIssubmtting(true);
-    console.log("setsubmiti is true.");
+    console.log("setsubmiting is true.");
+    const { email, password } = form;
 
     try {
-      const result = await getCurrentUser();
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      // const result = await getCurrentUser();
       router.replace("/home");
       console.log("Navigation to home page successful.");
       return result;
@@ -124,6 +129,7 @@ export default SignIn;
 const styles = StyleSheet.create({
   safeArea: {
     height: "100%",
+    // flex: 1,
     backgroundColor: "#ffff",
   },
   view: {

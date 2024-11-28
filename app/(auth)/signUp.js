@@ -13,7 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import rightCornerImage from "../../assets/images/rightcorner.png";
 
 // Import signIn and signUp functions from your API or library
-import { signIn, createUser } from "../../lib/appwrite"; // Replace with your actual paths
+// import { signIn, createUser } from "../../lib/appwrite"; // Replace with your actual paths
+import { auth, db } from "../../lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -29,11 +32,25 @@ const SignIn = () => {
       Alert.alert("Error", " All fields are required.");
       return;
     }
-
+    const { username, email, password } = form;
     setIsSubmitting(true);
     try {
-      const result = await createUser(form.username, form.email, form.password);
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
+      const user = result.user;
+      // Save additional user info to Firestore
+      await setDoc(doc(db, "user", user.uid), {
+        uid: user.uid,
+        accountId: user.uid,
+        username,
+        email,
+        password,
+      });
       Alert.alert("Success", "Account created successfully!");
+
       router.replace("/sign-in");
       return result;
     } catch (error) {

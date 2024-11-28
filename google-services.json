@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "579380055728",
+    "project_id": "imageo-84fb4",
+    "storage_bucket": "imageo-84fb4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:579380055728:android:e1fbfbfa3bb54a8d03b575",
+        "android_client_info": {
+          "package_name": "com.company.imageo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "579380055728-h7p8o8gu2ba0jsn3617qvkv6boobs3at.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCr4KOOPGk76766mqenHZRCqULNDXEYUQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "579380055728-h7p8o8gu2ba0jsn3617qvkv6boobs3at.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
