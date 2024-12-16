@@ -9,6 +9,7 @@ SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
   const [fontsLoaded, error] = useFonts({
+    // regular: require("../assets/fonts/SpaceMono-Regular.ttf"),
     regular: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 

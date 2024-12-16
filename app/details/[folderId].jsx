@@ -167,13 +167,20 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  listAll,
+  getDownloadURL,
+  uploadBytes,
+} from "firebase/storage";
 import { useNavigation } from "@react-navigation/native";
-
+import * as ImagePicker from "expo-image-picker";
 const FolderDetails = () => {
   const { folderId } = useLocalSearchParams(); // Get dynamic folderId from the route
   const [folderName, setFolderName] = useState("");
@@ -219,6 +226,44 @@ const FolderDetails = () => {
     if (folderId) fetchFolderDetails();
   }, [folderId]);
 
+  const handleAddPhoto = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: true,
+      });
+
+      if (result.canceled) return;
+
+      const selectedImages = result.assets;
+      const storage = getStorage();
+      const uploadedImageUrls = [];
+
+      for (const image of selectedImages) {
+        const imageRef = ref(storage, `folders/${folderId}/${image.fileName}`);
+        const response = await fetch(image.uri);
+        const blob = await response.blob();
+
+        await uploadBytes(imageRef, blob);
+        const downloadUrl = await getDownloadURL(imageRef);
+        uploadedImageUrls.push(downloadUrl);
+      }
+
+      // Update Firestore folder document with new image URLs
+      const folderRef = doc(db, "folders", folderId);
+      await updateDoc(folderRef, {
+        images: arrayUnion(...uploadedImageUrls),
+      });
+
+      // Update local state
+      setImages((prev) => [...prev, ...uploadedImageUrls]);
+      Alert.alert("Success", "Photos added successfully!");
+    } catch (error) {
+      console.error("Error adding photos:", error);
+      Alert.alert("Error", "Failed to add photos. Please try again.");
+    }
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.view}>
@@ -238,7 +283,7 @@ const FolderDetails = () => {
   return (
     <SafeAreaView style={styles.view}>
       <View style={styles.header}>
-        <TouchableOpacity style={[styles.touch]}>
+        <TouchableOpacity style={[styles.touch]} onPress={handleAddPhoto}>
           <Text>add photo</Text>
         </TouchableOpacity>
 
@@ -294,7 +339,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   imageContainer: {
-    // flexDirection: "row",
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
