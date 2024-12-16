@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState, createContext } from "react";
-// import { getCurrentUser } from "../lib/appwrite";
+
 import { auth, db } from "../lib/firebase";
 // import authConfig from "../lib/authConfig";
 import { onAuthStateChanged } from "firebase/auth";
-// import { onAuthStateChanged, signOut } from "firebase/auth";
-// import { doc, getDoc } from "firebase/firestore";
 
 const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -33,9 +31,9 @@ const GlobalProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
+    // return user ? <Home /> : <SignIn />;
   }, []);
 
-  // return user ? <HomeScreen /> : <LoginScreen />;
   // const logout = async () => {
   //   await signOut(auth);
   // };

@@ -1,356 +1,217 @@
-// // components/CreateFolder.js
-// import React, { useState } from "react";
-// import {
-//   View,
-//   TextInput,
-//   Button,
-//   Image,
-//   Alert,
-//   ActivityIndicator,
-//   StyleSheet,
-// } from "react-native";
-// import * as ImagePicker from "expo-image-picker";
-// import {
-//   createFolders,
-//   uploadss,
-//   MainUpload,
-//   uploadMultipleImages,
-// } from "../../lib/appwrite";
-// import { useRouter, router } from "expo-router";
-
-// const CreateFolder = () => {
-//   const [name, setName] = useState("");
-//   const [subtitle, setSubtitle] = useState("");
-//   const [selectedImages, setSelectedImages] = useState([]);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const router = useRouter();
-
-//   const pickImages = async () => {
-//     try {
-//       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-//       if (!permissionResult.granted) {
-//         Alert.alert(
-//           "Permission Required",
-//           "Please grant camera roll access to continue"
-//         );
-//         return;
-//       }
-
-//       const result = await ImagePicker.launchImageLibraryAsync({
-//         mediaTypes: ["images"],
-//         allowsMultipleSelection: true,
-//         quality: 1,
-//       });
-
-//       if (!result.canceled && result.assets) {
-//         setSelectedImages(result.assets);
-//       }
-//     } catch (error) {
-//       console.error("Error picking images:", error);
-//       Alert.alert("Error", "Failed to pick images");
-//     }
-//   };
-
-//   const handleCreate = async () => {
-//     if (!name.trim() || !subtitle.trim()) {
-//       Alert.alert("Required Fields", "Please fill in all fields");
-//       return;
-//     }
-
-//     setIsLoading(true);
-
-//     try {
-//       // Create a new folder
-//       const folder = await createFolders(name, subtitle);
-//       console.log("Folder created:", folder);
-
-//       // Check if there are selected images
-//       if (selectedImages.length > 0) {
-//         const imageFiles = selectedImages.map((image) => ({
-//           uri: image.uri,
-//           name: `image-${Date.now()}.jpg`,
-//           type: "image/jpeg",
-//         }));
-
-//         // Upload images to the created folder
-//         await uploadMultipleImages(folder.$id, imageFiles);
-//         console.log("Images uploaded successfully");
-//       }
-
-//       // Reset form fields
-//       setName("");
-//       setSubtitle("");
-//       setSelectedImages([]);
-
-//       Alert.alert("Success", "Folder created successfully!", [
-//         {
-//           text: "OK",
-//           onPress: () => router.push("/home"), // Navigate to the home screen
-//         },
-//       ]);
-//     } catch (error) {
-//       console.error("Error during folder creation or upload:", error);
-//       Alert.alert(
-//         "Error",
-//         "Failed to create folder or upload images. Please try again."
-//       );
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Folder Name"
-//         value={name}
-//         onChangeText={setName}
-//         editable={!isLoading}
-//       />
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Subtitle"
-//         value={subtitle}
-//         onChangeText={setSubtitle}
-//         editable={!isLoading}
-//       />
-
-//       <Button title="Pick Images" onPress={pickImages} disabled={isLoading} />
-
-//       <View style={styles.imageGrid}>
-//         {selectedImages.map((image, index) => (
-//           <Image
-//             key={index}
-//             source={{ uri: image.uri }}
-//             style={styles.thumbnail}
-//           />
-//         ))}
-//       </View>
-
-//       {isLoading ? (
-//         <ActivityIndicator size="large" color="#0000ff" />
-//       ) : (
-//         <Button
-//           title="Create Folder"
-//           onPress={handleCreate}
-//           disabled={!name.trim() || !subtitle.trim()}
-//         />
-//       )}
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     marginTop: 50,
-//     flex: 1,
-//     padding: 20,
-//     backgroundColor: "#fff",
-//   },
-//   input: {
-//     height: 40,
-//     borderColor: "gray",
-//     borderWidth: 1,
-//     marginBottom: 10,
-//     paddingHorizontal: 10,
-//     borderRadius: 5,
-//   },
-//   imageGrid: {
-//     flexDirection: "row",
-//     flexWrap: "wrap",
-//     marginVertical: 10,
-//   },
-//   thumbnail: {
-//     width: 100,
-//     height: 100,
-//     margin: 5,
-//     borderRadius: 5,
-//   },
-// });
-
-// export default CreateFolder;
-// import { db, auth, storage } from "../../lib/firebase";
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  View,
-  Button,
+  Alert,
   Text,
-  TextInput,
+  Button,
   Image,
-  FlatList,
   StyleSheet,
+  TextInput,
+  View,
+  ActivityIndicator,
 } from "react-native";
+import { db } from "@/lib/firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { onAuthStateChanged } from "firebase/auth";
-import { db, auth, storage } from "../../lib/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useGlobalContext } from "../../ContextFile/GlobalProvider"; // Import GlobalContext
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const CreateFolderScreen = () => {
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [folderName, setFolderName] = useState("");
+// Helper function to create folders in Firestore
+const createFolders = async ({ name, subtitle, userId }) => {
+  const folderData = {
+    name,
+    subtitle,
+    userId,
+    createdAt: new Date().toISOString(),
+  };
+
+  const folderRef = await addDoc(collection(db, "folders"), folderData);
+  return { id: folderRef.id, ...folderData }; // Return folder ID and data
+};
+
+// Helper function to upload multiple images to Firebase Storage
+const uploadMultipleImages = async (folderId, images) => {
+  const storage = getStorage();
+  const imageUrls = [];
+
+  for (const image of images) {
+    const imageRef = ref(storage, `folders/${folderId}/${image.fileName}`);
+    const response = await fetch(image.uri);
+    const blob = await response.blob();
+
+    await uploadBytes(imageRef, blob);
+    const downloadUrl = await getDownloadURL(imageRef);
+    imageUrls.push(downloadUrl);
+  }
+
+  return imageUrls; // Return the array of image URLs
+};
+
+const CreateFolder = () => {
+  const [name, setName] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Monitor the current user
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName || "Anonymous User",
-        });
-      } else {
-        setCurrentUser(null);
-      }
-    });
+  const { user } = useGlobalContext(); // Get the current user from GlobalContext
 
-    return () => unsubscribe();
-  }, []);
-
-  // Select multiple images
-  const pickImages = async () => {
+  const handleSelectImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsMultipleSelection: true, // Enable multiple selection (Expo SDK 49+)
+      mediaTypes: ImagePicker.MediaType.Images,
+      allowsMultipleSelection: true, // Enable multiple image selection
     });
 
     if (!result.canceled) {
-      setSelectedImages(result.assets.map((asset) => asset.uri));
+      setSelectedImages(result.assets);
     }
   };
 
-  // Upload images to Firebase Storage
-  const uploadImages = async (folderId) => {
-    const uploadedUrls = [];
-    for (const uri of selectedImages) {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      const imageRef = ref(
-        storage,
-        `folders/${folderId}/${uri.split("/").pop()}`
-      );
-      await uploadBytes(imageRef, blob);
-      const downloadUrl = await getDownloadURL(imageRef);
-
-      uploadedUrls.push(downloadUrl);
-    }
-    return uploadedUrls;
-  };
-
-  // Create folder in Firestore
-  const createFolder = async () => {
-    if (!currentUser) {
-      alert("You must be logged in to create a folder.");
+  const handleCreate = async () => {
+    if (!name.trim() || !subtitle.trim()) {
+      Alert.alert("Required Fields", "Please fill in all fields");
       return;
     }
 
-    if (!folderName || !subtitle) {
-      alert("Please enter a folder name and subtitle.");
+    if (!user) {
+      Alert.alert("Authentication Error", "No user is currently logged in.");
       return;
     }
 
-    if (selectedImages.length === 0) {
-      alert("Please select at least one image.");
-      return;
-    }
+    setIsLoading(true);
 
-    setUploading(true);
     try {
-      const folderId = `folder_${Date.now()}`; // Generate a unique folder ID
+      const userId = user.uid;
 
-      // Upload images and get their download URLs
-      const imageUrls = await uploadImages(folderId);
-
-      // Folder data to save in Firestore
-      const folderData = {
-        createdAt: serverTimestamp(),
-        createdBy: currentUser.uid,
-        folderId,
-        image: imageUrls,
-        name: folderName,
+      // Create folder in Firestore (this will only happen once)
+      const folder = await createFolders({
+        name,
         subtitle,
-        user: `/user/${currentUser.uid}`,
-      };
+        userId,
+      });
 
-      // Save folder to Firestore
-      await addDoc(collection(db, "folders"), folderData);
+      console.log("Folder created:", folder);
 
-      alert("Folder created successfully!");
-      setSelectedImages([]); // Clear selected images
-      setFolderName(""); // Reset folder name input
-      setSubtitle(""); // Reset subtitle input
+      // If images were selected, upload them
+      if (selectedImages.length > 0) {
+        const imageUrls = await uploadMultipleImages(folder.id, selectedImages);
+
+        // Update the folder document with image URLs
+        await addDoc(collection(db, "folders"), {
+          ...folder,
+          images: imageUrls,
+        });
+
+        console.log("Images uploaded and saved successfully.");
+      }
+
+      setName("");
+      setSubtitle("");
+      setSelectedImages([]);
+
+      Alert.alert("Success", "Folder created successfully!", [
+        {
+          text: "OK",
+          onPress: () => router.push("/home"), // Navigate to the home screen after success
+        },
+      ]);
     } catch (error) {
-      console.error("Error creating folder:", error);
-      alert("Failed to create folder. Please try again.");
+      console.error("Error during folder creation or upload:", error);
+      Alert.alert(
+        "Error",
+        "Failed to create folder or upload images. Please try again."
+      );
     } finally {
-      setUploading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.test}>
+        <Text style={styles.txt}>Create a Folder</Text>
+      </View>
       <TextInput
+        placeholder="Folder Name"
+        value={name}
+        onChangeText={setName}
         style={styles.input}
-        placeholder="Enter Folder Name"
-        value={folderName}
-        onChangeText={setFolderName}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Enter Description"
+        placeholder="Subtitle"
         value={subtitle}
         onChangeText={setSubtitle}
+        style={styles.input}
+        multiline
       />
-
-      <Button title="Pick Images" onPress={pickImages} />
-      <FlatList
-        data={selectedImages}
-        keyExtractor={(item, index) => index.toString()}
-        horizontal
-        renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={styles.imagePreview} />
-        )}
-      />
-
       <Button
-        title="Create Folder"
-        onPress={createFolder}
-        disabled={uploading}
+        title="Select Images"
+        onPress={handleSelectImage}
+        color="#423D3D"
       />
-    </View>
+      <View style={styles.imageContainer}>
+        {selectedImages.map((image, index) => (
+          <Image
+            key={index}
+            source={{ uri: image.uri }}
+            style={styles.imagePreview}
+          />
+        ))}
+      </View>
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        <Button
+          title="Create Folder"
+          onPress={handleCreate}
+          disabled={!name.trim() || !subtitle.trim()}
+        />
+      )}
+    </SafeAreaView>
   );
 };
 
-export default CreateFolderScreen;
+const styles = StyleSheet.create({
+  test: {
+    paddingVertical: 30,
+    width: "100%",
+  },
+  txt: {
+    textAlign: "center",
+    fontSize: 20,
+    fontFamily: "helvetica",
+    fontWeight: "bold",
+  },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 8,
+    marginVertical: 8,
+    borderRadius: 12,
+  },
+  imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 8,
+  },
+  imagePreview: {
+    width: 120,
+    height: 120,
+    margin: 4,
+    borderRadius: 8,
+  },
+  btn: {
+    backgroundColor: "#FA9884",
+    borderRadius: 12,
+  },
+});
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//     padding: 10,
-//   },
-//   input: {
-//     width: "80%",
-//     height: 40,
-//     borderColor: "#ccc",
-//     borderWidth: 1,
-//     borderRadius: 5,
-//     marginVertical: 10,
-//     paddingHorizontal: 10,
-//   },
-//   imagePreview: {
-//     width: 100,
-//     height: 100,
-//     margin: 5,
-//     borderRadius: 5,
-//   },
-// });
+export default CreateFolder;

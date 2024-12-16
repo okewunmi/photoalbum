@@ -16,23 +16,111 @@ import Feather from "@expo/vector-icons/Feather";
 import Card from "../../components/card";
 import Shared from "../../components/shared";
 import dash from "../../assets/images/dash.png";
-import Person3 from "../../assets/images/person6.jpeg";
-import Person2 from "../../assets/images/person7.jpeg";
-import Person1 from "../../assets/images/person8.jpeg";
-import { router, Redirect, Link } from "expo-router";
-import { getCurrentUser, fetchFolders } from "@/lib/appwrite";
+import { router } from "expo-router";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  limit,
+  orderBy,
+} from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
-const home = () => {
+const Home = () => {
   const [folder, setFolder] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState("Anonymous");
   const [refreshing, setRefreshing] = useState(false);
+  const [recentPhotos, setRecentPhotos] = useState([]); // State for recent photos
+
+  const fetchUserFolders = async () => {
+    setLoading(true);
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      try {
+        // Fetch folders of the current user
+        const folderQuery = query(
+          collection(db, "folders"),
+          where("userId", "==", currentUser.uid)
+        );
+
+        const folderSnapshot = await getDocs(folderQuery);
+
+        if (!folderSnapshot.empty) {
+          const userFolders = folderSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          setFolder(userFolders);
+
+          // Fetch images for each folder
+          await fetchImagesInFolders(userFolders);
+        } else {
+          console.log("No folders found for the current user.");
+          setFolder([]);
+          setRecentPhotos([]); // Reset recent photos if no folders
+        }
+      } catch (error) {
+        console.error("Error fetching user folders:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.log("No user is currently logged in.");
+      setLoading(false);
+    }
+  };
+
+  const fetchImagesInFolders = async (folders) => {
+    try {
+      const allImages = [];
+      for (const folder of folders) {
+        // Fetching images within each folder
+        // Assuming `folder.images` is an array of image URLs stored in the `folder` document
+        const folderImages = folder.images || []; // Use empty array if no images exist
+
+        allImages.push(...folderImages); // Add to consolidated list of all images
+      }
+
+      setRecentPhotos(allImages); // Update state with all images
+    } catch (error) {
+      console.error("Error fetching images in folders:", error.message);
+    }
+  };
+
+  const fetchCurrentUser = async () => {
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      try {
+        const userQuery = query(
+          collection(db, "user"),
+          where("uid", "==", currentUser.uid)
+        );
+
+        const userSnapshot = await getDocs(userQuery);
+
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          setUserName(userData.username || "Anonymous");
+        } else {
+          console.log("User document not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error.message);
+      }
+    } else {
+      console.log("No user is currently logged in.");
+    }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      const fetchedFolders = await fetchFolders();
-      setFolder(fetchedFolders); // Update the folder state
+      await fetchUserFolders();
     } catch (error) {
       console.error("Error refreshing folders:", error.message);
     } finally {
@@ -41,72 +129,40 @@ const home = () => {
   };
 
   useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        if (currentUser && currentUser.username) {
-          setUserName(currentUser.username);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error.message);
-      }
-    };
-
-    fetchUserName();
+    fetchUserFolders();
+    fetchCurrentUser();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const currentUser = await getCurrentUser();
-
-        if (currentUser && currentUser.username) {
-          setUserName(currentUser.username);
-        }
-
-        const fetchedFolders = await fetchFolders();
-
-        setFolder(fetchedFolders);
-      } catch (error) {
-        console.error("Error fetching data:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* <FlatList
+      <FlatList
         data={folder || []}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.headercard} key={item.$id}>
-            <Link
-              href={{
-                pathname: "/details/[folderId]",
-                params: { folderId: item.$id },
-              }}
+          <View style={styles.headercard} key={item.id}>
+            {/* <TouchableOpacity
+              onPress={() => router.push("/details/[folderId]")}
             >
               <Card post={item} />
-            </Link>
+            </TouchableOpacity> */}
+            <TouchableOpacity
+              onPress={() => router.push(`/details/${item.id}`)} // Pass the folderId dynamically
+            >
+              <Card post={item} />
+            </TouchableOpacity>
           </View>
         )}
         ListHeaderComponent={() => (
           <View style={styles.Listheader}>
             <View style={styles.head}>
-              <View>
-                <Text style={styles.welcome}>Hi, {userName}</Text>
-              </View>
+              <Text style={styles.welcome}>Hi, {userName}</Text>
               <TouchableOpacity>
                 <Image source={dash} resizeMode="contain" size={20} />
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.boxInput}>
               <TextInput
-                placeholder="search for folder.."
+                placeholder="Search for folder..."
                 keyboardType="text"
                 style={styles.input}
               />
@@ -116,7 +172,7 @@ const home = () => {
             </TouchableOpacity>
             <View style={styles.shared}>
               <Text style={styles.sharedtxt}>Recent Photos</Text>
-              <Shared />
+              <Shared recentPhotos={recentPhotos} />
             </View>
             <View style={styles.ListFolder}>
               <Text style={styles.sharedtxt}>Latest Folder</Text>
@@ -133,12 +189,12 @@ const home = () => {
             </Text>
           )
         }
-      /> */}
+      />
     </SafeAreaView>
   );
 };
 
-export default home;
+export default Home;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -149,7 +205,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   Listheader: {
-    paddingTop: 30,
+    paddingTop: 20,
     paddingHorizontal: 25,
   },
   shared: {
@@ -157,17 +213,16 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingBottom: 15,
     borderBottomColor: "#dbdbdb",
-    borderBottomWidth: 1,
+    borderBottomWidth: 2,
     borderStyle: "solid",
-
-    // flexDirection: "row",
   },
   sharedtxt: {
     paddingBottom: 18,
     fontFamily: "Helvetica",
-    fontSize: 16,
-    paddingLeft: 15,
-    color: "#7b7676",
+    fontSize: 18,
+    paddingLeft: 10,
+    color: "#6b5454",
+    fontWeight: "bold",
   },
 
   ListFolder: {
@@ -175,7 +230,7 @@ const styles = StyleSheet.create({
   },
   welcome: {
     fontFamily: "inter",
-    fontSize: 29,
+    fontSize: 20,
     fontWeight: "bold",
     // color: "#575353",
   },

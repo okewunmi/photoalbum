@@ -2,12 +2,16 @@ import React from "react";
 
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
-import { router } from "expo-router";
+import { router, Link, Redirect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import welcome from "../assets/images/welcome.png";
+import { useGlobalContext } from "../ContextFile/GlobalProvider";
 
 const Index = () => {
+  const { user, loading, isLogged } = useGlobalContext();
+  if (!loading && isLogged) return <Redirect href="/home" />;
+
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.Box}>
@@ -18,14 +22,13 @@ const Index = () => {
         <View style={styles.btnBox}>
           <TouchableOpacity
             style={styles.btnWhite}
-            onPress={() => router.replace("/sign-in")}
+            onPress={() => router.push("/signIn")}
           >
             <Text style={styles.btn2}> Login</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.btncolor}
-            onPress={() => router.push("/sign-up")}
+            onPress={() => router.push("/signUp")}
           >
             <Text style={styles.btn1}>Sign Up</Text>
           </TouchableOpacity>

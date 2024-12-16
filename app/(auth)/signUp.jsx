@@ -51,7 +51,7 @@ const SignIn = () => {
       });
       Alert.alert("Success", "Account created successfully!");
 
-      router.replace("/sign-in");
+      router.replace("/signIn");
       return result;
     } catch (error) {
       Alert.alert("Sign Up Failed", error.message || "An error occurred.");

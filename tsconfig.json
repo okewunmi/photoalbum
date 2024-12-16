@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "components/Search.jsx", "app/(tabs)/_layout.jsx", "app/(tabs)/folder.jsx", "app/(tabs)/profile.jsx", "app/(tabs)/home.jsx", "app/index.jsx", "app/(auth)/signIn.js", "app/(auth)/sign-up.js"  ]
+, "components/Search.jsx", "app/(tabs)/_layout.jsx", "app/(tabs)/folder.jsx", "app/(tabs)/profile.jsx", "app/(tabs)/home.jsx", "app/index.jsx", "app/(auth)/signIn.jsx", "app/(auth)/sign-up.js"  ]
 }

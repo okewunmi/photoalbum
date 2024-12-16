@@ -8,16 +8,20 @@ import {
   Modal,
   Alert,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-
+import Person from "../assets/images/person5.jpeg";
 import * as Linking from "expo-linking";
 import * as Clipboard from "expo-clipboard";
 const Card = ({ post }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  if (!post?.images || post.images.length === 0) {
+    return null;
+  }
 
   const handleShareLink = async (platform) => {
     const link = "https://yourlink.com"; // replace with your actual link
@@ -63,7 +67,8 @@ const Card = ({ post }) => {
     Alert.alert("Link copied to clipboard!");
   };
 
-  const { name, subtitle, createdAt, id } = post;
+  const { name, subtitle, createdAt, id, image } = post;
+  const firstPostImage = post.images[0];
 
   function formatCreatedAt(createdAt) {
     const now = new Date();
@@ -94,27 +99,30 @@ const Card = ({ post }) => {
       <View style={styles.card}>
         <View style={styles.head}>
           <View style={styles.image}>
-            {/* <LinearGradient
-              colors={["#c17388", "#90306f"]}
-              style={{ flex: 1 }}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            /> */}
-            {/* <View style={styles.bg}></View> */}
-            <View>
+            <View style={styles.boxTxt}>
               <Text style={styles.txt1}>{name || "Fabrics Collections"}</Text>
               <Text style={styles.txt2}>{subtitle || "Classic Materials"}</Text>
             </View>
           </View>
         </View>
-        <View style={styles.body}></View>
+
+        <View style={styles.body}>
+          {firstPostImage ? (
+            <Image
+              source={{ uri: firstPostImage } || Person}
+              style={styles.img}
+            />
+          ) : (
+            <Text>No image available</Text>
+          )}
+        </View>
         <View style={styles.bottom}>
           <Text style={styles.txt3}>
             {formatCreatedAt(createdAt) || "30 mins"}
           </Text>
           <View style={styles.shared}>
+            <Text style={styles.txt3}>{post.images.length}</Text>
             <FontAwesome name="image" size={20} color="#575353" />
-            <Text style={styles.txt3}>3</Text>
           </View>
         </View>
       </View>
@@ -227,14 +235,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
+  boxTxt: {
+    gap: 4,
+  },
   txt1: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "900",
     fontFamily: "Inter",
     color: "#000",
+    lineHeight: 20,
   },
   txt2: {
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 0,
     fontFamily: "Inter",
     color: "#575353",
@@ -269,7 +281,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "70%",
     borderRadius: 10,
-    backgroundColor: "#4531b9",
+    // backgroundColor: "#4531b9",
+  },
+  img: {
+    height: "100%",
+    width: "100%",
+    borderRadius: 10,
   },
   bottom: {
     display: "flex",
