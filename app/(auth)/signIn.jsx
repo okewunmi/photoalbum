@@ -96,7 +96,7 @@ const SignIn = () => {
         </View>
         <View style={styles.reg}>
           <Text>Don't have an account?</Text>
-          <Link href="/sign-up">
+          <Link href="/signUp">
             <Text style={styles.regLink}>Sign Up</Text>
           </Link>
         </View>
